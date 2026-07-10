@@ -58,17 +58,21 @@
             <input id="checkOut" type="time" name="checkOut" [(ngModel)]="formCheckOut" />
           </div>
         </div> -->
-      <div class="field-row">
-        <div class="field">
-          <label for="checkIn">Check in</label>
-          <input id="checkIn" type="text" name="checkIn" placeholder="09:00 AM" [(ngModel)]="formCheckIn" />
+      <form>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="checkIn">Check in</label>
+            <input id="checkIn" type="time" name="checkIn" [(ngModel)]="formCheckIn" />
+          </div>
+
+          <div class="field">
+            <label for="checkOut">Check out</label>
+            <input id="checkOut" type="time" name="checkOut" [(ngModel)]="formCheckOut" />
+          </div>
         </div>
 
-        <div class="field">
-          <label for="checkOut">Check out</label>
-          <input id="checkOut" type="text" name="checkOut" placeholder="05:30 PM" [(ngModel)]="formCheckOut" />
-        </div>
-      </div>
+      </form>
       }
 
       @if (!editingId() && recordForFormDate()) {
