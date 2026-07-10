@@ -1,0 +1,99 @@
+<h1>Manager dashboard</h1>
+
+<section class="summary-row">
+  <div class="card summary-card">
+    <span class="summary-label">Present days ({{ month() }})</span>
+    <span class="summary-value">{{ presentCount() }}</span>
+  </div>
+  <div class="card summary-card">
+    <span class="summary-label">Pending requests</span>
+    <span class="summary-value">{{ pendingRequests().length }}</span>
+  </div>
+  <div class="card summary-card">
+    <label class="summary-label" for="month-picker">Month</label>
+    <input
+      id="month-picker"
+      type="month"
+      [ngModel]="month()"
+      (ngModelChange)="onMonthChange($event)"
+      name="month"
+    />
+  </div>
+  <div class="card summary-card">
+    <label class="summary-label" for="employee-picker">Employee</label>
+    <select
+      id="employee-picker"
+      name="employee"
+      [ngModel]="employeeFilter()"
+      (ngModelChange)="employeeFilter.set($event)"
+    >
+      <option value="all">All employees</option>
+      @for (name of employeeNames(); track name) {
+        <option [value]="name">{{ name }}</option>
+      }
+    </select>
+  </div>
+</section>
+
+<div class="grid-2">
+  <section class="card">
+    <h2>Leave requests</h2>
+    @if (leaveRequests().length === 0) {
+      <p class="empty">No leave requests yet.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Dates</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (request of leaveRequests(); track request.id) {
+            <tr>
+              <td>{{ request.employeeName }}</td>
+              <td>{{ request.from }} → {{ request.to }}</td>
+              <td>{{ request.reason }}</td>
+              <td><span class="badge" [class]="'badge-' + request.status">{{ request.status }}</span></td>
+              <td class="row-actions">
+                @if (request.status === 'pending') {
+                  <button class="btn btn-success small" (click)="decide(request, 'approved')">Approve</button>
+                  <button class="btn btn-danger small" (click)="decide(request, 'rejected')">Reject</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+
+  <section class="card">
+    <h2>Attendance records</h2>
+    @if (filteredRecords().length === 0) {
+      <p class="empty">No attendance records for this selection.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (record of filteredRecords(); track record.id) {
+            <tr>
+              <td>{{ record.employeeName }}</td>
+              <td>{{ record.date }}</td>
+              <td><span class="badge" [class]="'badge-' + record.status">{{ record.status }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</div>

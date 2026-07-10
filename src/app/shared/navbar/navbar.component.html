@@ -1,0 +1,11 @@
+@if (profile(); as user) {
+  <header class="navbar">
+    <a class="brand" [routerLink]="user.role === 'manager' ? '/manager' : '/employee'">
+      Attend<span>Ly</span>
+    </a>
+    <div class="navbar-right">
+      <span class="who">{{ user.name }} · <em>{{ user.role }}</em></span>
+      <button class="btn btn-ghost" (click)="logout()">Sign out</button>
+    </div>
+  </header>
+}

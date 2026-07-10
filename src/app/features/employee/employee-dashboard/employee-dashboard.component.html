@@ -1,0 +1,361 @@
+<h1>My dashboard</h1>
+
+<section class="summary-row">
+  <div class="card summary-card">
+    <span class="summary-label">Present days this month</span>
+    <span class="summary-value">{{ presentCount() }}</span>
+  </div>
+
+  <div class="card summary-card">
+    <span class="summary-label">Pending leave requests</span>
+    <span class="summary-value">{{ pendingCount() }}</span>
+  </div>
+
+  <div class="card summary-card">
+    <label class="summary-label" for="month-picker">Viewing month</label>
+    <input id="month-picker" type="month" [ngModel]="month()" (ngModelChange)="onMonthChange($event)" name="month" />
+  </div>
+</section>
+
+
+<div class="grid-2">
+
+  <!-- Attendance Section -->
+  <section class="card">
+
+    <h2>{{ editingId() ? 'Edit attendance' : 'Mark attendance' }}</h2>
+
+    <form (ngSubmit)="saveAttendance()" #attendanceForm="ngForm">
+
+      <div class="field-row">
+
+        <div class="field">
+          <label for="date">Date</label>
+          <input id="date" type="date" name="date" [(ngModel)]="formDate" [attr.readonly]="editingId() ? true : null"
+            required />
+        </div>
+
+        <div class="field">
+          <label for="status">Status</label>
+          <select id="status" name="status" [(ngModel)]="formStatus">
+            @for (s of statuses; track s) {
+            <option [value]="s">{{ s }}</option>
+            }
+          </select>
+        </div>
+
+      </div>
+
+      @if (formStatus !== 'absent') {
+      <!-- <div class="field-row">
+          <div class="field">
+            <label for="checkIn">Check in</label>
+            <input id="checkIn" type="time" name="checkIn" [(ngModel)]="formCheckIn" />
+          </div>
+
+          <div class="field">
+            <label for="checkOut">Check out</label>
+            <input id="checkOut" type="time" name="checkOut" [(ngModel)]="formCheckOut" />
+          </div>
+        </div> -->
+      <div class="field-row">
+        <div class="field">
+          <label for="checkIn">Check in</label>
+          <input id="checkIn" type="text" name="checkIn" placeholder="09:00 AM" [(ngModel)]="formCheckIn" />
+        </div>
+
+        <div class="field">
+          <label for="checkOut">Check out</label>
+          <input id="checkOut" type="text" name="checkOut" placeholder="05:30 PM" [(ngModel)]="formCheckOut" />
+        </div>
+      </div>
+      }
+
+      @if (!editingId() && recordForFormDate()) {
+      <p class="empty">A record already exists for this date — saving will overwrite it.</p>
+      }
+
+      @if (attendanceError(); as message) {
+      <p class="error-text">{{ message }}</p>
+      }
+
+      <div class="row-actions">
+        <button class="btn btn-primary" type="submit" [disabled]="savingAttendance() || attendanceForm.invalid">
+          {{ savingAttendance() ? 'Saving…' : editingId() ? 'Update attendance' : 'Save attendance' }}
+        </button>
+
+        @if (editingId()) {
+        <button class="btn btn-ghost" type="button" (click)="cancelEdit()">Cancel</button>
+        }
+      </div>
+
+    </form>
+
+
+
+    <h3 class="table-heading">This month's records</h3>
+
+
+    @if (records().length === 0) {
+
+
+    <p class="empty">
+      No attendance marked yet for {{ month() }}.
+    </p>
+
+
+    } @else {
+
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Date</th>
+
+          <th>Status</th>
+
+          <th>Time</th>
+
+          <th></th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+
+        @for (record of records(); track record.id) {
+
+
+        <tr>
+
+
+          <td>
+            {{ record.date }}
+          </td>
+
+
+
+          <td>
+
+            <span class="badge" [class]="'badge-' + record.status">
+
+              {{ record.status }}
+
+            </span>
+
+          </td>
+
+
+
+          <td>
+
+            {{ record.checkIn }} -
+            {{ record.checkOut || 'Not checked out' }}
+
+          </td>
+
+
+
+          <td class="row-actions">
+
+
+            <button class="btn btn-ghost small" (click)="startEdit(record)">
+
+              Edit
+
+            </button>
+
+
+
+            <button class="btn btn-danger small" (click)="deleteAttendance(record)">
+
+              Delete
+
+            </button>
+
+
+          </td>
+
+
+        </tr>
+
+
+        }
+
+
+      </tbody>
+
+
+    </table>
+
+
+    }
+
+
+  </section>
+
+
+
+
+  <!-- Leave Section (unchanged) -->
+
+  <section class="card">
+
+    <h2>Request leave</h2>
+
+
+    <form (ngSubmit)="submitLeave()" #leaveForm="ngForm">
+
+
+      <div class="field-row">
+
+
+        <div class="field">
+
+          <label for="from">From</label>
+
+          <input id="from" type="date" name="from" [(ngModel)]="leaveFrom" required />
+
+        </div>
+
+
+
+        <div class="field">
+
+          <label for="to">To</label>
+
+          <input id="to" type="date" name="to" [(ngModel)]="leaveTo" required />
+
+        </div>
+
+
+      </div>
+
+
+
+      <div class="field">
+
+
+        <label for="reason">Reason</label>
+
+
+        <textarea id="reason" name="reason" rows="3" [(ngModel)]="leaveReason" required
+          placeholder="e.g. Family event"></textarea>
+
+
+      </div>
+
+
+
+      @if (leaveError(); as message) {
+
+      <p class="error-text">
+        {{ message }}
+      </p>
+
+      }
+
+
+
+      <button class="btn btn-primary" type="submit" [disabled]="savingLeave() || leaveForm.invalid">
+
+
+        {{ savingLeave() ? 'Submitting…' : 'Submit request' }}
+
+
+      </button>
+
+
+    </form>
+
+
+
+    <h3 class="table-heading">My requests</h3>
+
+
+
+    @if (leaveRequests().length === 0) {
+
+
+    <p class="empty">
+      No leave requests yet.
+    </p>
+
+
+    } @else {
+
+
+    <table>
+
+
+      <thead>
+
+        <tr>
+
+          <th>Dates</th>
+
+          <th>Reason</th>
+
+          <th>Status</th>
+
+        </tr>
+
+      </thead>
+
+
+
+      <tbody>
+
+
+        @for (request of leaveRequests(); track request.id) {
+
+
+        <tr>
+
+
+          <td>
+            {{ request.from }} → {{ request.to }}
+          </td>
+
+
+          <td>
+            {{ request.reason }}
+          </td>
+
+
+          <td>
+
+            <span class="badge" [class]="'badge-' + request.status">
+
+              {{ request.status }}
+
+            </span>
+
+          </td>
+
+
+        </tr>
+
+
+        }
+
+
+      </tbody>
+
+
+    </table>
+
+
+    }
+
+
+  </section>
+
+
+</div>

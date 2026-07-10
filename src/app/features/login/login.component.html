@@ -1,0 +1,136 @@
+<div class="login-page">
+
+  <!-- Left Side -->
+  <div class="left-panel">
+
+    <div class="brand">
+      <h1>Attend<span>Ly</span></h1>
+      <p>Employee Attendance & Leave Management System</p>
+    </div>
+
+    <div class="hero-content">
+      <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900" alt="Office Team" />
+
+      <h2>Welcome to AttendLy</h2>
+
+      <p>
+        Simplify attendance tracking, leave approvals and workforce
+        productivity with one secure platform.
+      </p>
+
+      <div class="features">
+
+        <div class="feature">
+          <span>✔</span>
+          <div>
+            <h4>Attendance Tracking</h4>
+            <p>Check In & Check Out with real-time records.</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <span>✔</span>
+          <div>
+            <h4>Leave Management</h4>
+            <p>Apply, approve and manage leave requests.</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <span>✔</span>
+          <div>
+            <h4>Role Based Access</h4>
+            <p>Separate dashboards for Employees & Managers.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Side -->
+  <div class="right-panel">
+
+    <div class="login-card">
+
+      <h2>
+        {{ mode() === 'sign-in' ? 'Welcome Back' : 'Create Account' }}
+      </h2>
+
+      <p class="subtitle">
+        {{
+        mode() === 'sign-in'
+        ? 'Sign in to continue'
+        : 'Create your AttendLy account'
+        }}
+      </p>
+
+      <form (ngSubmit)="submit()" #f="ngForm">
+
+        @if(mode()==='sign-up'){
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" name="name" [(ngModel)]="name" placeholder="John Doe" required />
+        </div>
+        }
+
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" name="email" [(ngModel)]="email" placeholder="john@company.com" required />
+        </div>
+
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" name="password" [(ngModel)]="password" placeholder="Enter password" required
+            minlength="6" />
+        </div>
+
+        @if(mode()==='sign-up'){
+        <div class="input-group">
+          <label>Role</label>
+
+          <select name="role" [(ngModel)]="role">
+            <option value="employee">Employee</option>
+            <option value="manager">Manager</option>
+          </select>
+        </div>
+        }
+
+        @if(errorMessage()){
+        <div class="error">
+          {{ errorMessage() }}
+        </div>
+        }
+
+        <button class="login-btn" type="submit" [disabled]="loading() || f.invalid">
+          {{
+          loading()
+          ? 'Please wait...'
+          : mode() === 'sign-in'
+          ? 'Sign In'
+          : 'Create Account'
+          }}
+        </button>
+
+      </form>
+
+      <div class="divider">
+        <span></span>
+        <p>OR</p>
+        <span></span>
+      </div>
+
+      <button class="switch-btn" (click)="toggleMode()" type="button">
+        {{
+        mode()==='sign-in'
+        ? 'Create a new account'
+        : 'Already have an account? Sign In'
+        }}
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

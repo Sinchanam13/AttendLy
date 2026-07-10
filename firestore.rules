@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function myRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isManager() {
+      return isSignedIn() && myRole() == 'manager';
+    }
+
+    // Users can read any profile (needed to show names), but can only
+    // create/update their own profile, and can never change their own role
+    // after signup (role is set once at sign-up time).
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(uid);
+      allow update, delete: if false;
+    }
+
+    // Attendance: an employee manages only their own records.
+    // A manager can read everyone's records but not modify them.
+    match /attendance/{recordId} {
+      allow read: if isSignedIn() && (resource.data.uid == request.auth.uid || isManager());
+      allow create, update, delete: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+    }
+
+    // Leave: an employee can create and read their own requests.
+    // A manager can read all requests and update only the status field.
+    match /leave/{requestId} {
+      allow read: if isSignedIn() && (resource.data.uid == request.auth.uid || isManager());
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.status == 'pending';
+      allow update: if isManager()
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'decidedAt']);
+      allow delete: if false;
+    }
+  }
+}

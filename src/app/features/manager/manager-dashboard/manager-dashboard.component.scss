@@ -1,0 +1,64 @@
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.summary-label {
+  font-size: 0.8rem;
+  color: var(--color-ink-muted);
+  font-weight: 600;
+}
+
+.summary-value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--color-primary);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.table-heading {
+  margin-top: 1.75rem;
+  font-size: 1rem;
+}
+
+.empty {
+  color: var(--color-ink-muted);
+  font-size: 0.9rem;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.small {
+  padding: 0.35em 0.7em;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 800px) {
+  .summary-row,
+  .grid-2,
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+}
